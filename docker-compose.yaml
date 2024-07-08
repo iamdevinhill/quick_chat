@@ -1,16 +1,14 @@
 version: '3'
 services:
   web:
-    build: .
+    build: ./app
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
-    depends_on:
-      - frontend
+      - ./app:/app
   frontend:
     image: nginx:alpine
     volumes:
-      - ./index.html:/usr/share/nginx/html/index.html
+      - ./app/index.html:/usr/share/nginx/html/index.html
     ports:
       - "8080:80"

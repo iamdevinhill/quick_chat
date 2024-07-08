@@ -4,11 +4,14 @@ FROM python:3.8-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy all files from the current directory to the container
-COPY . .
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-# Install FastAPI and required dependencies
-RUN pip install --no-cache-dir fastapi uvicorn transformers
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the current directory contents into the container at /app
+COPY . .
 
 # Expose port 8000 to the outside world
 EXPOSE 8000
