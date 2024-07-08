@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Assistant</title>
+    <!-- Styling for the virtual assistant interface -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #333; /* Dark background color */
+            color: #ddd; /* Light text color */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 600px; /* Limit chat container width */
+            background-color: #444; /* Darker container background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #666; /* Darker border */
+        }
+        .chat-header {
+            background-color: #007bff; /* Accent color */
+            color: #fff; /* Light text color */
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .chat-body {
+            padding: 20px;
+            max-height: 300px; /* Limit chat history height */
+            overflow-y: auto; /* Scrollable if overflow */
+            color: #ddd; /* Light text color */
+        }
+        .chat-input {
+            width: calc(100% - 40px); /* Adjust input width */
+            margin: 0 20px; /* Margin around input */
+            padding: 10px;
+            border: 1px solid #666; /* Darker border */
+            border-radius: 20px;
+            font-size: 1em;
+            background-color: #555; /* Darker input background */
+            color: #ddd; /* Light text color */
+        }
+        .chat-button {
+            background-color: #007bff; /* Accent color */
+            color: #fff; /* Light text color */
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 1em;
+        }
+        .chat-button:hover {
+            background-color: #0056b3; /* Darker accent color on hover */
+        }
+        .chat-response {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #555; /* Darker response background */
+            border: 1px solid #666; /* Darker border */
+            border-radius: 8px;
+            color: #ddd; /* Light text color */
+        }
+    </style>
+</head>
+<body>
+    <!-- Main chat interface -->
+    <div class="chat-container">
+        <!-- Header of the chat interface -->
+        <div class="chat-header">
+            Virtual Assistant
+        </div>
+        <!-- Chat history display -->
+        <div class="chat-body" id="chatBody">
+            <!-- Chat messages will be inserted dynamically here -->
+        </div>
+        <!-- User input section -->
+        <div style="display: flex; align-items: center; padding: 10px;">
+            <input type="text" id="userInput" class="chat-input" placeholder="Type your query here...">
+            <button onclick="sendQuery()" class="chat-button">Ask</button>
+        </div>
+        <br>
+        <br>
+        <!-- Assistant response display -->
+        <div class="chat-response" id="response">
+            <!-- Response from the assistant will be inserted dynamically here -->
+        </div>
+    </div>
+
+    <!-- JavaScript for handling user interaction -->
+    <script>
+        async function sendQuery() {
+            const userInput = document.getElementById('userInput').value.trim(); // Get user input and trim whitespace
+            if (userInput === '') {
+                alert('Please enter a query.'); // Alert user if input is empty
+                return;
+            }
+    
+            try {
+                const response = await fetch('http://127.0.0.1:8000/chat/', { // Send POST request to local server
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input_text: userInput }) // Send user input as JSON data
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok'); // Handle error if response is not ok
+                }
+
+                const data = await response.json(); // Parse response JSON
+                const chatBody = document.getElementById('chatBody'); // Get chat history container
+                const responseDiv = document.createElement('div'); // Create new div for response
+                responseDiv.innerHTML = `<strong>You:</strong> ${userInput}<br><br><strong>Assistant:</strong><br>${data.response}<hr>`; // Format response HTML
+                chatBody.appendChild(responseDiv); // Append response to chat history
+                
+                document.getElementById('userInput').value = ''; // Clear input field after sending query
+            } catch (error) {
+                console.error('Error:', error); // Log any errors that occur
+            }
+        }
+    </script>
+</body>
+</html>
